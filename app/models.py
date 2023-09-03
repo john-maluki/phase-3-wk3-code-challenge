@@ -2,6 +2,8 @@ from sqlalchemy import Column, Integer, String, MetaData, ForeignKey
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 
+from connect import Session
+
 convention = {
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
 }
@@ -16,6 +18,13 @@ class Customer(Base):
     last_name = Column(String(), nullable=False)
     reviews = relationship("Review", backref=backref('customer'))
     restaurants = relationship("Restaurant", secondary="reviews", back_populates="customers")
+
+    def full_name(self):
+        """
+            Returns the full name of the customer, with the first name 
+            and the last name  concatenated, Western style.
+        """
+        return f"{self.first_name} {self.last_name}"
 
     def get_reviews(self):
         """
@@ -35,6 +44,39 @@ class Customer(Base):
             reviewed
         """
         return self.restaurants
+    
+    def favorite_restaurant(self):
+        """
+            Returns the restaurant instance that has the highest star rating from this customer
+        """
+        review = max(self.get_reviews(), key=lambda a: a.star_rating)
+        return review.get_restaurant()
+    
+    def add_review(self, restaurant, rating):
+        """
+            Takes a `restaurant` (an instance of the `Restaurant` class) and a rating and
+            creates a new review for the restaurant with the given `restaurant_id`
+        """
+        review = Review(
+            customer_id=self.id,
+            restaurant_id=restaurant.id,
+            star_rating=rating)
+        
+        session = Session.object_session(self)
+        session.add(review)
+        session.commit()
+
+    def delete_reviews(self, restaurant):
+        """
+            Takes a `restaurant` (an instance of the `Restaurant` class) and
+            removes **all** their reviews for this restaurant you will have to delete rows 
+            from the `reviews` table to get this to work!
+        """
+        session = Session.object_session(self)
+        delete_q = Review.__table__.delete().where(Review.customer_id==self.id).where(Review.restaurant_id==restaurant.id)
+        # reviews = session.query(Review).filter_by(customer_id=self.id, restaurant_id=restaurant.id)[0]
+        session.execute(delete_q)
+        session.commit()
 
     def __repr__(self):
         return f"<Customer first_name={self.first_name} last_name={self.last_name}>"
