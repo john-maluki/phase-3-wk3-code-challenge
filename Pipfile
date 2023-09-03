@@ -10,6 +10,7 @@ importlib-resources = "5.10.0"
 ipdb = "0.13.9"
 sqlalchemy = "1.4.42"
 faker = "==14.2.0"
+pytest = "*"
 
 [dev-packages]
 
