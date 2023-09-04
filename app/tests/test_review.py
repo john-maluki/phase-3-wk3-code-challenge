@@ -105,6 +105,46 @@ class TestReview:
 
         clear_db(session)
 
+    def test_full_review(self):
+        """
+            Tests should return a string formatted as follows: Review for 
+            {insert restaurant name} by {insert customer's full name}: 
+            {insert review star_rating} stars.
+        """
+        engine = create_engine(SQLITE_URL)
+        Session = sessionmaker(bind=engine)
+        session = Session()
+
+        clear_db(session)
+
+        customer = Customer(first_name="John", last_name="Doe")
+        session.add(customer)
+
+        session.commit()
+
+        customer = session.query(Customer).first()
+
+        restaurant1 = Restaurant(name="R1", price=1000)
+        session.add(restaurant1)
+
+        session.commit()
+
+        restaurant1 = session.query(Restaurant).first()
+
+        review1c1 = Review(star_rating=5, customer_id=customer.id, restaurant_id=restaurant1.id)
+
+        session.add(review1c1)
+        session.commit()
+
+        review1c1 = session.query(Review).first()
+
+        assert review1c1.full_review() == "Review for R1 by John Doe: 5 stars."
+
+        clear_db(session)
+
+
+
+
 
 
 
