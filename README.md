@@ -159,9 +159,28 @@ The following have been used on this project:
 
 - [Python3](https://docs.python.org/3.10/)
 - [Pytest](https://docs.pytest.org/en/latest/contents.html)
-- [SQLAlchemy](https://docs.sqlalchemy.org/en/20/)
-- [Alembic](https://alembic.sqlalchemy.org/en/latest/)
-- [Faker](https://faker.readthedocs.io/en/master/)
+- [SQLAlchemy==1.4.42](https://docs.sqlalchemy.org/en/20/)
+- [Alembic==1.8.1](https://alembic.sqlalchemy.org/en/latest/)
+- [Faker==14.2.0](https://faker.readthedocs.io/en/master/)
+
+## Project Setup
+
+- Clone the repository: `git clone <repository-url>`
+- Navigate to cloned repository: `cd phase-3-wk3-code-challenge`
+- Create pipenv environment and Install dependencies: `pipenv install`
+- Activate environment: ` pipenv install`
+- Run test using pytest: `pytest`
+
+## Create database migrations
+
+- create db from migrations with alembic: `cd app && alembic updgrade head`
+- populate db with `seed.py`: `python3 seed.py`
+
+## Testing manually with debug file (ipdb)
+
+- Navigate to `app` directory: ` cd app`
+- Run `seed.py` file to populate db with fake data: ` python3 seed.py`
+- Run `debug.py` file to get ipdb terminal: ` python3 debug.py`
 
 ## Authors
 
