@@ -1,8 +1,8 @@
-from sqlalchemy import Column, Integer, String, MetaData, ForeignKey
+from sqlalchemy import Column, Integer, String, MetaData, ForeignKey, desc
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 
-from connect import Session
+from connect import Session, session
 
 convention = {
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
@@ -108,6 +108,23 @@ class Restaurant(Base):
             Returns a collection of all the customers who reviewed the `Restaurant`
         """
         return self.customers
+    
+    def all_reviews(self):
+        """
+            Should return an list of strings with all the reviews for this restaurant
+            formatted as follows:
+        """
+        reviews = [review.full_review() for review in self.get_reviews()]
+        return reviews
+    
+    @classmethod
+    def fanciest(cls):
+        """
+            Returns _one_ restaurant instance for the restaurant that has the highest   price
+        """
+        restaurant = session.query(cls).order_by(desc(cls.price)).first()
+        return restaurant
+    
 
     def __repr__(self):
         return f"<Restaurant name={self.name} price={self.price}>"
@@ -138,5 +155,16 @@ class Review(Base):
         """
         return self.restaurant # from relationship in Restaurant class
     
+    def full_review(self):
+        """
+            Should return a string formatted as follows: Review for 
+            {insert restaurant name} by {insert customer's full name}: 
+            {insert review star_rating} stars.
+        """
+        return f"Review for {self.get_restaurant().name} by {self.get_customer().full_name()}: {str(self.star_rating)} stars."
+
+    
     def __repr__(self):
         return f"<Review star_rating={self.star_rating}>"
+    
+
